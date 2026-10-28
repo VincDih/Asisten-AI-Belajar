@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Asisten Belajar AI Offline berbasis aturan (Rule-Based AI) lokal di browser untuk menelusuri dan memahami modul materi secara mendalam tanpa internet.">
+  <title>EduMind AI - Asisten Belajar Mandiri Offline</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="theme-dark">
+  <div class="app-layout">
+
+    <!-- SIDEBAR KIRI: Manajemen Modul Materi -->
+    <aside class="sidebar" id="sidebar" aria-label="Manajemen Modul Belajar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
+              <path d="M6 6h10" />
+              <path d="M6 10h10" />
+              <path d="M9 18v-4" />
+              <path d="M12 18v-2" />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h2>EduMind <span class="gradient-text">AI</span></h2>
+            <span class="brand-tag">Asisten Belajar Offline</span>
+          </div>
+        </div>
+        <button class="icon-btn sidebar-close-btn" id="closeSidebarBtn" title="Tutup Menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Action Buttons Sidebar -->
+      <div class="sidebar-actions">
+        <button class="btn btn-primary btn-block" id="openAddModuleModalBtn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Tambah Modul</span>
+        </button>
+        <div class="secondary-actions">
+          <label class="btn btn-ghost btn-sm" for="importFileInput" title="Impor file teks (.txt / .md / .json)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <span>Impor File</span>
+          </label>
+          <input type="file" id="importFileInput" accept=".txt,.md,.json" style="display: none;">
+          <button class="btn btn-ghost btn-sm" id="exportAllModulesBtn" title="Ekspor semua modul ke JSON">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Cadangkan</span>
+          </button>
+          <button class="btn btn-ghost btn-sm" id="clearAllModulesBtn" title="Hapus / Reset semua modul">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Status Modul -->
+      <div class="sidebar-meta">
+        <div class="module-search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchModuleInput" placeholder="Cari modul materi...">
+        </div>
+        <div class="module-stats">
+          <span id="activeModuleCount">0 aktif</span>
+          <span class="dot-separator">•</span>
+          <span id="totalModuleCount">0 total modul</span>
+        </div>
+      </div>
+
+      <!-- Daftar Modul (Module List) -->
+      <div class="module-list" id="moduleList" tabindex="0" aria-label="Daftar Modul Belajar">
+        <!-- Rendered via JavaScript -->
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="sidebar-footer">
+        <div class="engine-badge">
+          <div class="pulse-indicator"></div>
+          <span>Rule-Based AI Offline Ready</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- AREA UTAMA: Topbar & Chat Assistant -->
+    <main class="main-content">
+      <!-- Top Navigation -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="icon-btn mobile-menu-btn" id="openSidebarBtn" title="Buka Modul">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
+          <div class="header-titles">
+            <h1>Asisten Belajar Cerdas</h1>
+            <p class="subtitle" id="topbarSubtitle">Siap membantu menganalisis & menjawab pertanyaan berdasarkan modul
+              materi Anda</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <!-- Active Modules Quick Pill -->
+          <div class="status-pill" id="activeModulesPill" title="Modul yang saat ini aktif ditelusuri AI">
+            <span class="status-dot"></span>
+            <span id="activeModulesPillText">0 Modul Aktif</span>
+          </div>
+
+          <!-- Tombol Latihan Kuis -->
+          <button class="btn btn-primary btn-sm quiz-header-btn" id="openQuizBtn" title="Buka Latihan Kuis Mandiri">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 11l3 3L22 4"></path>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            <span>Latihan Kuis</span>
+          </button>
+
+          <!-- Clear Chat Button -->
+          <button class="icon-btn" id="clearChatBtn" title="Bersihkan Percakapan">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+          </button>
+
+          <!-- Theme Switcher -->
+          <button class="icon-btn theme-toggle" id="themeToggleBtn" title="Ubah Tema Gelap / Terang">
+            <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+            <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+              stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat Container -->
+      <div class="chat-container">
+        <!-- Messages Area -->
+        <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+          <!-- Welcome message rendered via JS or default greeting -->
+        </div>
+
+        <!-- Quick Suggestions Pill Tray -->
+        <div class="suggestions-tray" id="suggestionsTray">
+          <span class="suggestion-label">Saran Pertanyaan:</span>
+          <div class="suggestion-chips" id="suggestionChips">
+            <!-- Dynamic Chips -->
+          </div>
+        </div>
+
+        <!-- Chat Input Bar -->
+        <div class="chat-input-area">
+          <form class="chat-input-form" id="chatForm">
+            <div class="input-wrapper">
+              <textarea id="userQueryInput"
+                placeholder="Ajukan pertanyaan mengenai materi modul (contoh: 'Apa pengertian...', 'Bagaimana cara...', 'Jelaskan perbedaan...')"
+                rows="1" aria-label="Tulis pertanyaan materi"></textarea>
+              <button type="submit" class="send-btn" id="sendBtn" title="Kirim Pertanyaan">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13"></line>
+                  <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+              </button>
+            </div>
+            <div class="input-footer">
+              <span class="input-tip">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Tekan <strong>Enter</strong> untuk mengirim, <strong>Shift + Enter</strong> untuk baris baru
+              </span>
+              <span class="offline-guarantee">100% Offline di Browser</span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: Tambah / Edit Modul -->
+  <div class="modal-backdrop" id="moduleModalBackdrop">
+    <div class="modal" id="moduleModal" role="dialog" aria-labelledby="modalTitle" aria-modal="true">
+      <div class="modal-header">
+        <h3 id="modalTitle">Tambah Modul Materi</h3>
+        <button class="icon-btn modal-close-btn" id="closeModalBtn" title="Tutup">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <form id="moduleForm" class="modal-body">
+        <input type="hidden" id="moduleIdInput">
+
+        <div class="form-group">
+          <label for="moduleTitleInput">Judul Modul <span class="required">*</span></label>
+          <input type="text" id="moduleTitleInput" required
+            placeholder="Contoh: Pengenalan Algoritma Pemrograman, Hukum Newton, Tata Surya...">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="moduleCategoryInput">Kategori / Topik (Opsional)</label>
+            <input type="text" id="moduleCategoryInput" placeholder="Contoh: Ilmu Komputer, Fisika, Biologi...">
+          </div>
+          <div class="form-group">
+            <label for="moduleTagsInput">Kata Kunci / Tag (Pisahkan koma)</label>
+            <input type="text" id="moduleTagsInput" placeholder="Contoh: dasar, struktur data, konsep">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="content-header-row">
+            <label for="moduleContentInput">Isi Materi Lengkap <span class="required">*</span></label>
+            <span class="word-count" id="contentWordCount">0 kata</span>
+          </div>
+          <textarea id="moduleContentInput" rows="10" required placeholder="Tuliskan atau tempel (paste) materi modul di sini...
+Tips format:
+- Gunakan subjudul dengan simbol '#' atau 'Bab:' untuk membagi topik
+- Gunakan 'adalah' atau 'merupakan' untuk pola definisi istilah
+- Gunakan poin '-' atau nomor '1.' untuk langkah/daftar"></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelModalBtn">Batal</button>
+          <button type="submit" class="btn btn-primary" id="saveModuleBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+              <polyline points="17 21 17 13 7 13 7 21"></polyline>
+              <polyline points="7 3 7 8 15 8"></polyline>
+            </svg>
+            Simpan Modul
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Lihat Isi Lengkap Modul -->
+  <div class="modal-backdrop" id="viewModalBackdrop">
+    <div class="modal modal-lg" id="viewModal" role="dialog" aria-labelledby="viewModalTitle" aria-modal="true">
+      <div class="modal-header">
+        <div>
+          <span class="badge" id="viewModalCategory">Materi</span>
+          <h3 id="viewModalTitle" style="margin-top: 6px;">Judul Modul</h3>
+        </div>
+        <button class="icon-btn modal-close-btn" id="closeViewModalBtn" title="Tutup">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="view-meta-bar">
+          <span id="viewModalStats">0 kata • Diperbarui baru saja</span>
+          <div class="view-actions">
+            <button class="btn btn-sm btn-secondary" id="viewEditBtn">Edit Materi</button>
+            <button class="btn btn-sm btn-secondary" id="viewAskBtn">Tanya Soal Modul Ini</button>
+            <button class="btn btn-sm btn-primary" id="viewQuizBtn">Kuis Modul Ini</button>
+          </div>
+        </div>
+        <div class="view-content-box" id="viewModalContent">
+          <!-- Text content rendered here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Latihan Kuis Interaktif -->
+  <div class="modal-backdrop" id="quizModalBackdrop">
+    <div class="modal modal-lg" id="quizModal" role="dialog" aria-labelledby="quizModalTitle" aria-modal="true">
+
+      <!-- Tampilan 1: Pengaturan Kuis -->
+      <div id="quizSetupView">
+        <div class="modal-header">
+          <div>
+            <span class="badge">Uji Pemahaman</span>
+            <h3 id="quizModalTitle" style="margin-top: 4px;">Latihan Kuis Mandiri</h3>
+          </div>
+          <button class="icon-btn modal-close-btn" id="closeQuizSetupBtn" title="Tutup Kuis">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="quiz-setup-desc">
+            Uji sejauh mana penguasaan Anda terhadap materi yang telah dipelajari. Soal kuis dirancang secara otomatis
+            dari modul materi aktif menggunakan Rule-Based AI.
+          </p>
+
+          <div class="quiz-setup-card">
+            <div class="form-group">
+              <label for="quizModuleSelect">Pilih Sumber Modul Materi</label>
+              <select id="quizModuleSelect" class="form-select">
+                <option value="all">Semua Modul Aktif</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-top: 1rem;">
+              <label>Jumlah Pertanyaan</label>
+              <div class="quiz-count-selector" id="quizCountSelector">
+                <button type="button" class="count-pill active" data-count="3">3 Soal</button>
+                <button type="button" class="count-pill" data-count="5">5 Soal</button>
+                <button type="button" class="count-pill" data-count="10">10 Soal</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer" style="padding: 1rem 1.5rem;">
+          <button type="button" class="btn btn-secondary" id="cancelQuizSetupBtn">Batal</button>
+          <button type="button" class="btn btn-primary" id="startQuizBtn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+            Mulai Kuis Sekarang
+          </button>
+        </div>
+      </div>
+
+      <!-- Tampilan 2: Sesi Pengerjaan Kuis -->
+      <div id="quizPlayView" style="display: none;">
+        <div class="modal-header">
+          <div class="quiz-play-header-info">
+            <div class="quiz-step-indicator">
+              <span id="quizCurrentStepText">Soal 1 dari 5</span>
+              <span class="quiz-source-pill" id="quizCurrentSource">Modul</span>
+            </div>
+            <div class="quiz-progress-bar-bg">
+              <div class="quiz-progress-bar-fill" id="quizProgressBar"></div>
+            </div>
+          </div>
+          <button class="icon-btn modal-close-btn" id="abortQuizBtn" title="Batalkan Kuis">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="quiz-question-box">
+            <h4 id="quizQuestionText">Pertanyaan kuis akan dimuat di sini...</h4>
+          </div>
+
+          <div class="quiz-options-grid" id="quizOptionsContainer">
+            <!-- 4 Opsi Pilihan Ganda A, B, C, D -->
+          </div>
+
+          <!-- Quick Question Dots -->
+          <div class="quiz-question-dots" id="quizQuestionDots"></div>
+        </div>
+
+        <div class="modal-footer quiz-footer-controls">
+          <button type="button" class="btn btn-secondary" id="prevQuestionBtn" disabled>
+            ← Sebelumnya
+          </button>
+          <button type="button" class="btn btn-primary" id="nextQuestionBtn">
+            Selanjutnya →
+          </button>
+        </div>
+      </div>
+
+      <!-- Tampilan 3: Hasil Kuis, Skor & Kunci Jawaban Lengkap -->
+      <div id="quizResultView" style="display: none;">
+        <div class="modal-header">
+          <div>
+            <span class="badge" id="quizResultBadge">Hasil Evaluasi</span>
+            <h3 style="margin-top: 4px;">Hasil & Kunci Jawaban Kuis</h3>
+          </div>
+          <button class="icon-btn modal-close-btn" id="closeQuizResultBtn" title="Tutup">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="modal-body quiz-result-scrollable">
+          <!-- Kartu Ringkasan Skor -->
+          <div class="score-summary-card">
+            <div class="score-circle">
+              <span class="score-number" id="quizScoreValue">80</span>
+              <span class="score-label">SKOR ANDA</span>
+            </div>
+            <div class="score-meta">
+              <h4 id="quizGradeText">Sangat Baik! 🎉</h4>
+              <p id="quizMotivationalText">Bagus sekali! Pemahaman Anda mengenai materi sudah mantap.</p>
+              <div class="score-stats-row">
+                <span class="stat-badge correct" id="quizCorrectCount">✓ 4 Benar</span>
+                <span class="stat-badge wrong" id="quizWrongCount">✗ 1 Salah</span>
+                <span class="stat-badge info" id="quizTimeSpent">⏱ 45 Detik</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bagian Pembahasan & Kunci Jawaban Langsung -->
+          <div class="answer-key-section">
+            <div class="answer-key-header">
+              <h4>Kunci Jawaban & Pembahasan Materi</h4>
+              <span class="answer-key-sub">Dihitung instan tanpa memuat ulang halaman</span>
+            </div>
+
+            <div class="answer-key-list" id="answerKeyList">
+              <!-- Rendered items via JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding: 1rem 1.5rem; justify-content: space-between;">
+          <button type="button" class="btn btn-secondary" id="restartQuizBtn">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+            </svg>
+            Ulangi Kuis
+          </button>
+          <button type="button" class="btn btn-primary" id="finishReviewBtn">
+            Selesai Belajar
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- JAVASCRIPT MODULES -->
+  <script src="js/module-store.js"></script>
+  <script src="js/rule-engine.js"></script>
+  <script src="js/quiz-engine.js"></script>
+  <script src="js/app.js"></script>
+</body>
+
+</html>
